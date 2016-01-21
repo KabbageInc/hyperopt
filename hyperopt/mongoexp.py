@@ -114,6 +114,8 @@ import warnings
 
 import numpy
 import pymongo
+pymongo.Connection = pymongo.MongoClient
+
 import gridfs
 from bson import SON
 
@@ -257,9 +259,9 @@ def connection_with_tunnel(host='localhost',
             ssh_tunnel=None
 
         # -- Ensure that changes are written to at least once server.
-        connection.write_concern['w'] = 1
+        #connection.write_concern['w'] = 1
         # -- Ensure that changes are written to the journal if there is one.
-        connection.write_concern['j'] = True
+        #connection.write_concern['j'] = True
 
         return connection, ssh_tunnel
 
@@ -324,7 +326,7 @@ class MongoJobs(object):
         """
         self.db = db
         self.jobs = jobs
-        assert jobs.write_concern['w'] >= 1
+        #assert jobs.write_concern['w'] >= 1
         self.gfs = gfs
         self.conn = conn
         self.tunnel = tunnel
@@ -429,7 +431,7 @@ class MongoJobs(object):
         if cond is None:
             cond = {}
         try:
-            for d in self.jobs.find(spec=cond, fields=['_id', '_attachments']):
+            for d in self.jobs.find(spec=cond):
                 logger.info('deleting job %s' % d['_id'])
                 for name, file_id in d.get('_attachments', []):
                     try:
@@ -706,8 +708,7 @@ class MongoTrials(Trials):
         orig_trials = getattr(self, '_trials', [])
         _trials = orig_trials[:] #copy to make sure it doesn't get screwed up
         if _trials:
-            db_data = list(self.handle.jobs.find(query,
-                                            fields=['_id', 'version']))
+            db_data = list(self.handle.jobs.find(query))
             # -- pull down a fresh list of ids from mongo
             if db_data:
                 #make numpy data arrays
@@ -1300,4 +1301,3 @@ def main_worker():
         return -1
 
     return main_worker_helper(options, args)
-
