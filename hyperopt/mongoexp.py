@@ -1084,6 +1084,8 @@ class MongoWorker(object):
                     if not obj:
                         result = worker_fn(spec, ctrl)
                     else:
+                        print spec
+                        print obj_args
                         result = obj(spec, **obj_args)
                     result = SONify(result)
             except BaseException, e:
