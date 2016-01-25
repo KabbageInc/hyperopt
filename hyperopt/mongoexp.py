@@ -1044,6 +1044,9 @@ class MongoWorker(object):
 
             cmd = job['misc']['cmd']
             cmd_protocol = cmd[0]
+            if obj:
+                cmd_protocol = 'obj'
+
             try:
                 if cmd_protocol == 'cpickled fn':
                     worker_fn = cPickle.loads(cmd[1])
@@ -1072,6 +1075,8 @@ class MongoWorker(object):
                         logger.info('Error while unpickling. Try installing dill via "pip install dill" for enhanced pickling support.')
                         raise
                     worker_fn = domain.evaluate
+                elif cmd_protocol == 'obj':
+                    worker_fn = obj
                 else:
                     raise ValueError('Unrecognized cmd protocol', cmd_protocol)
 
