@@ -999,6 +999,8 @@ class MongoWorker(object):
         host_id=None,
         reserve_timeout=None,
         erase_created_workdir=False,
+        obj=None,
+        obj_args=None
         ):
         if host_id == None:
             host_id = '%s:%i'%(socket.gethostname(), os.getpid()),
@@ -1074,7 +1076,10 @@ class MongoWorker(object):
                     raise ValueError('Unrecognized cmd protocol', cmd_protocol)
 
                 with temp_dir(workdir, erase_created_workdir), working_dir(workdir):
-                    result = worker_fn(spec, ctrl)
+                    if not obj:
+                        result = worker_fn(spec, ctrl)
+                    else:
+                        result = obj(spec, **obj_args)
                     result = SONify(result)
             except BaseException, e:
                 #XXX: save exception to database, but if this fails, then
