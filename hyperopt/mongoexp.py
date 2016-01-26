@@ -284,6 +284,19 @@ def connection_from_string(s):
     return connection, tunnel, connection[db], connection[db][collection]
 
 
+def clean_spec(spec):
+    """
+    """
+    clean_spec = {}
+    for key, value in spec.iteritems():
+        if isinstance(value, float):
+            if value == int(value):
+                clean_spec[key] = int(value)
+        else:
+            clean_spec[key] = value
+    return clean_spec
+
+
 class MongoJobs(object):
     """
     # Interface to a Jobs database structured like this
@@ -1084,6 +1097,7 @@ class MongoWorker(object):
                     if not obj:
                         result = worker_fn(spec, ctrl)
                     else:
+                        spec = clean_spec(spec)
                         stream = json.dumps(spec)
                         result = obj([stream], **obj_args)
                     result = SONify(result)
