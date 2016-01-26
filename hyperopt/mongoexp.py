@@ -118,7 +118,7 @@ pymongo.Connection = pymongo.MongoClient
 
 import gridfs
 from bson import SON
-
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -1084,10 +1084,8 @@ class MongoWorker(object):
                     if not obj:
                         result = worker_fn(spec, ctrl)
                     else:
-                        stream = str(spec)
-                        print stream
+                        stream = json.dumps(spec)
                         result = obj([stream], **obj_args)
-                        print result
                     result = SONify(result)
             except BaseException, e:
                 #XXX: save exception to database, but if this fails, then
