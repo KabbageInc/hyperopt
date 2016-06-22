@@ -1099,7 +1099,7 @@ class MongoWorker(object):
                     else:
                         spec = clean_spec(spec)
                         stream = json.dumps(spec)
-                        result = obj([stream], **obj_args)
+                        result = dict(obj([stream], **obj_args)).get('result')
                     result = SONify(result)
             except BaseException, e:
                 #XXX: save exception to database, but if this fails, then
